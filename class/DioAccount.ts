@@ -1,7 +1,9 @@
+import promptSync from "prompt-sync";
+const prompt = promptSync();
 export abstract class DioAccount {
-  private name: string
+  private readonly name: string
   private readonly accountNumber: number
-  balance: number = 0
+  private balance: number = 0
   private status: boolean = true
 
   constructor(name: string, accountNumber: number){
@@ -9,30 +11,45 @@ export abstract class DioAccount {
     this.accountNumber = accountNumber
   }
 
-  setName = (name: string): void => {
-    this.name = name
-    console.log('Nome alterado com sucesso!')
-  }
-
   getName = (): string => {
     return this.name
   }
 
+  setBalance = (balance: number): void => {
+    this.balance = balance;
+  }
+  
   deposit = (): void => {
+    let value: number = 0;
     if(this.validateStatus()){
-      console.log('Voce depositou')
+      value = parseFloat(prompt('Qual o valor do Depósito?')!)
+      this.setBalance(this.getBalance() + value)
+      console.log('Você Depositou: R$' + value + ' reais.')
+      console.log('Saldo Atual: R$' + this.getBalance() + ' reais.')
     }
   }
 
   withdraw = (): void => {
-    console.log('Voce sacou')
+    let value: number = 0;
+    if(!this.validateStatus()){
+      console.log('Conta Inválida!')
+    } else{
+      value = parseFloat(prompt('Qual o valor do Saque?')!)
+        if(value > this.getBalance()){
+          console.log('Saldo Insuficiente!')
+        } else{
+          this.setBalance(this.getBalance() - value)
+          console.log('Voce Sacou: ' + value + ' reais.')
+          console.log('Saldo Atual: ' + this.getBalance() + ' reais.')
+        }
+      } 
   }
 
-  getBalance = (): void => {
-    console.log(this.balance)
+  getBalance = (): number => {
+    return this.balance
   }
 
-  private validateStatus = (): boolean => {
+  validateStatus = (): boolean => {
     if (this.status) {
       return this.status
     }
